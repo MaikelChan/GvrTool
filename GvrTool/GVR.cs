@@ -398,6 +398,7 @@ namespace GvrTool
 
             TGA tga = new TGA(Width, Height, TgaPixelDepth.Bpp8, TgaImageType.Uncompressed_ColorMapped);
             tga.Header.ImageSpec.ImageDescriptor.ImageOrigin = TgaImgOrigin.TopLeft;
+            tga.Header.ImageSpec.Y_Origin = Height;
             tga.Header.ColorMapSpec.ColorMapEntrySize = tgaColorMapEntrySize;
             tga.Header.ColorMapSpec.ColorMapLength = PaletteEntryCount;
             tga.ImageOrColorMapArea.ImageData = tgaPixels;
