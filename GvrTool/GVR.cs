@@ -4,7 +4,7 @@ using TGASharpLib;
 
 namespace GvrTool
 {
-    class GVR
+    public class GVR
     {
         public ushort Width { get; private set; }
         public ushort Height { get; private set; }
@@ -259,7 +259,7 @@ namespace GvrTool
                         }
 
                         Palette = new byte[PaletteEntryCount * 2];
-                        byte[] tgaPalette = tga.ImageOrColorMapArea.ImageData;
+                        byte[] tgaPalette = tga.ImageOrColorMapArea.ColorMapData;
                         uint tgaPaletteOffset = 0;
 
                         for (int p = 0; p < Palette.Length; p += 2)
