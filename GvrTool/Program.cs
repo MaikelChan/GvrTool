@@ -9,7 +9,7 @@ namespace GvrTool
         {
             ShowHeader();
 
-            if (args.Length < 9)
+            if (args.Length < 3)
             {
                 ShowUsage();
                 return;
