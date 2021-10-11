@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <Version>0.0.1</Version>
+    <Description>Tool that allows to convert from GVR image format to TGA and viceversa.</Description>
+    <Authors>MaikelChan / PacoChan</Authors>
+  </PropertyGroup>
+
+</Project>
