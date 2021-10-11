@@ -25,13 +25,13 @@ namespace GvrTool.Tests
                 string jsonFilePath = Path.ChangeExtension(gvrFilePath1, ".json");
                 string tgaFilePath = Path.ChangeExtension(gvrFilePath1, ".tga");
 
-                GVR gvr = new GVR();
-                gvr.LoadFromGvrFile(gvrFilePath1);
-                gvr.SaveToTgaFile(tgaFilePath);
+                GVR gvr1 = new GVR();
+                gvr1.LoadFromGvrFile(gvrFilePath1);
+                gvr1.SaveToTgaFile(tgaFilePath);
 
-                gvr = new GVR();
-                gvr.LoadFromTgaFile(tgaFilePath);
-                gvr.SaveToGvrFile(gvrFilePath2);
+                GVR gvr2 = new GVR();
+                gvr2.LoadFromTgaFile(tgaFilePath);
+                gvr2.SaveToGvrFile(gvrFilePath2);
 
                 byte[] gvrHash1;
                 byte[] gvrHash2;
@@ -48,7 +48,7 @@ namespace GvrTool.Tests
 
                 Assert.IsTrue(CompareHashes(gvrHash1, gvrHash2), $"File \"{testFileName}\" was not regenerated correctly.");
 
-                if (File.Exists(gvpFilePath1))
+                if (gvr1.HasExternalPalette)
                 {
                     byte[] gvpHash1;
                     byte[] gvpHash2;

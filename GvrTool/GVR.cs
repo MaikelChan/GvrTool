@@ -21,6 +21,11 @@ namespace GvrTool
         public byte[] Pixels { get; private set; }
         public byte[] Palette { get; private set; }
 
+        // Helpers
+        public bool HasExternalPalette => (DataFlags & GvrDataFlags.ExternalPalette) != 0;
+        public bool HasInternalPalette => (DataFlags & GvrDataFlags.InternalPalette) != 0;
+        public bool HasPalette => (DataFlags & GvrDataFlags.Palette) != 0;
+
         bool isLoaded;
 
         const uint GCIX_MAGIC = 0x58494347;
@@ -79,7 +84,7 @@ namespace GvrTool
                     throw new NotImplementedException($"Textures with mip maps are not supported.");
                 }
 
-                if ((DataFlags & GvrDataFlags.ExternalPalette) == 0)
+                if (!HasExternalPalette)
                 {
                     throw new NotImplementedException($"Textures without external palette are not supported.");
                 }
@@ -98,7 +103,7 @@ namespace GvrTool
                 }
             }
 
-            if ((DataFlags & GvrDataFlags.ExternalPalette) != 0)
+            if (HasExternalPalette)
             {
                 string gvpPath = Path.ChangeExtension(gvrPath, ".gvp");
 
@@ -208,8 +213,7 @@ namespace GvrTool
                     throw new NotImplementedException($"GVR has an unsupported data format: {DataFormat}.");
             }
 
-
-            if ((DataFlags & GvrDataFlags.ExternalPalette) != 0)
+            if (HasExternalPalette)
             {
                 switch (PalettePixelFormat)
                 {
@@ -455,7 +459,7 @@ namespace GvrTool
                 }
             }
 
-            if ((DataFlags & GvrDataFlags.ExternalPalette) != 0)
+            if (HasExternalPalette)
             {
                 string gvpFilePath = Path.ChangeExtension(gvrFilePath, ".gvp");
 
