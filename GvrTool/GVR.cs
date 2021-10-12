@@ -301,6 +301,7 @@ namespace GvrTool
             }
 
             TgaColorMapEntrySize tgaColorMapEntrySize = TgaColorMapEntrySize.Other;
+            byte tgaAlphaChannelBits = 0;
             byte[] tgaPixels = null;
             byte[] tgaPalette = null;
 
@@ -346,6 +347,7 @@ namespace GvrTool
                     case GvrPixelFormat.Rgb5a3:
 
                         tgaColorMapEntrySize = TgaColorMapEntrySize.A8R8G8B8;
+                        tgaAlphaChannelBits = 8;
                         tgaPalette = new byte[PaletteEntryCount * 4];
 
                         for (int p = 0; p < tgaPalette.Length; p += 4)
@@ -374,6 +376,7 @@ namespace GvrTool
                     case GvrPixelFormat.Rgb565:
 
                         tgaColorMapEntrySize = TgaColorMapEntrySize.R8G8B8;
+                        tgaAlphaChannelBits = 0;
                         tgaPalette = new byte[PaletteEntryCount * 3];
 
                         for (int p = 0; p < tgaPalette.Length; p += 3)
@@ -396,6 +399,7 @@ namespace GvrTool
 
             TGA tga = new TGA(Width, Height, TgaPixelDepth.Bpp8, TgaImageType.Uncompressed_ColorMapped);
             tga.Header.ImageSpec.ImageDescriptor.ImageOrigin = TgaImgOrigin.TopLeft;
+            tga.Header.ImageSpec.ImageDescriptor.AlphaChannelBits = tgaAlphaChannelBits;
             tga.Header.ImageSpec.Y_Origin = Height;
             tga.Header.ColorMapSpec.ColorMapEntrySize = tgaColorMapEntrySize;
             tga.Header.ColorMapSpec.ColorMapLength = PaletteEntryCount;
