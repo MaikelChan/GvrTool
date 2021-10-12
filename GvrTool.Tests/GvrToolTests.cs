@@ -10,8 +10,9 @@ namespace GvrTool.Tests
         const string TestFilesDirectory = @"..\..\..\..\..\GVRs";
 
         [DataTestMethod]
-        [DataRow("0000.gvr")] // ImageData: I4, PaletteData: RGB5A3 (RGB555)   - Resident Evil: Code Veronica (GameCube)
-        [DataRow("0001.gvr")] // ImageData: I4, PaletteData: RGB565            - Resident Evil: Code Veronica (GameCube)
+        [DataRow("0000.gvr")] // ImageData: I4, PaletteData: RGB5A3   - Resident Evil: Code Veronica (GameCube)
+        [DataRow("0001.gvr")] // ImageData: I4, PaletteData: RGB565   - Resident Evil: Code Veronica (GameCube)
+        [DataRow("0002.gvr")] // ImageData: I8, PaletteData: RGB5A3   - Resident Evil: Code Veronica (GameCube)
         public void Regenerate(string testFileName)
         {
             using (MD5 md5 = MD5.Create())
