@@ -43,5 +43,20 @@ namespace GvrTool
             if (bigEndian) bw.Write(SwapU16(value));
             else bw.Write(value);
         }
+
+        public static byte[] FlipImageY(byte[] input, ushort width, ushort height, int bytesPerPixel)
+        {
+            byte[] pixels = new byte[input.Length];
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width * bytesPerPixel; x++)
+                {
+                    pixels[y * width + x] = input[(height - y - 1) * width + x];
+                }
+            }
+
+            return pixels;
+        }
     }
 }

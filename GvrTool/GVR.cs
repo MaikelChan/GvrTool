@@ -152,7 +152,22 @@ namespace GvrTool
             Width = tga.Width;
             Height = tga.Height;
 
-            Pixels = tga.ImageOrColorMapArea.ImageData;
+            switch (tga.Header.ImageSpec.ImageDescriptor.ImageOrigin)
+            {
+                case TgaImgOrigin.TopLeft:
+
+                    Pixels = tga.ImageOrColorMapArea.ImageData;
+                    break;
+
+                case TgaImgOrigin.BottomLeft:
+
+                    Pixels = Utils.FlipImageY(tga.ImageOrColorMapArea.ImageData, Width, Height, (byte)tga.Header.ImageSpec.PixelDepth >> 3);
+                    break;
+
+                default:
+
+                    throw new NotImplementedException($"TGA file ImageOrigin mode not supported: {tga.Header.ImageSpec.ImageDescriptor.ImageOrigin}.");
+            }
 
             //if (tga.Header.ImageSpec.PixelDepth != TgaPixelDepth.Bpp8)
             //{
