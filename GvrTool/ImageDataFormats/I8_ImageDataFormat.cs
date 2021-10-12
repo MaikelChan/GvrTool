@@ -1,4 +1,5 @@
-﻿using TGASharpLib;
+﻿using System;
+using TGASharpLib;
 
 namespace GvrTool.ImageDataFormats
 {
@@ -27,11 +28,8 @@ namespace GvrTool.ImageDataFormats
                 {
                     for (int y2 = 0; y2 < 4; y2++)
                     {
-                        for (int x2 = 0; x2 < 8; x2++)
-                        {
-                            output[(((y + y2) * Width) + (x + x2))] = input[offset];
-                            offset++;
-                        }
+                        Array.Copy(input, offset, output, ((y + y2) * Width) + x, 8);
+                        offset += 8;
                     }
                 }
             }
@@ -50,11 +48,8 @@ namespace GvrTool.ImageDataFormats
                 {
                     for (int y2 = 0; y2 < 4; y2++)
                     {
-                        for (int x2 = 0; x2 < 8; x2++)
-                        {
-                            output[offset] = input[((y + y2) * Width) + (x + x2)];
-                            offset++;
-                        }
+                        Array.Copy(input, ((y + y2) * Width) + x, output, offset, 8);
+                        offset += 8;
                     }
                 }
             }
