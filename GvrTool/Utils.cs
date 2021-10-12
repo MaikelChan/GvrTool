@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace GvrTool
 {
@@ -46,17 +47,15 @@ namespace GvrTool
 
         public static byte[] FlipImageY(byte[] input, ushort width, ushort height, int bytesPerPixel)
         {
-            byte[] pixels = new byte[input.Length];
+            byte[] output = new byte[input.Length];
+            int bytesPerRow = width * bytesPerPixel;
 
             for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < width * bytesPerPixel; x++)
-                {
-                    pixels[y * width + x] = input[(height - y - 1) * width + x];
-                }
+                Array.Copy(input, (height - 1 - y) * width, output, y * width, bytesPerRow);
             }
 
-            return pixels;
+            return output;
         }
     }
 }
