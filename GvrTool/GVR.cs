@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GvrTool.ImageDataFormats;
+using System;
 using System.IO;
 using TGASharpLib;
 
@@ -26,6 +27,7 @@ namespace GvrTool
         public bool HasExternalPalette => (DataFlags & GvrDataFlags.ExternalPalette) != 0;
         public bool HasInternalPalette => (DataFlags & GvrDataFlags.InternalPalette) != 0;
         public bool HasPalette => (DataFlags & GvrDataFlags.Palette) != 0;
+        public bool HasMipmaps => (DataFlags & GvrDataFlags.Mipmaps) != 0;
 
         bool isLoaded;
 
@@ -81,7 +83,7 @@ namespace GvrTool
                 Width = br.ReadUInt16Endian(BIG_ENDIAN);
                 Height = br.ReadUInt16Endian(BIG_ENDIAN);
 
-                if ((DataFlags & GvrDataFlags.Mipmaps) != 0)
+                if (HasMipmaps)
                 {
                     throw new NotImplementedException($"Textures with mip maps are not supported.");
                 }
@@ -91,24 +93,8 @@ namespace GvrTool
                     throw new NotImplementedException($"Textures without external palette are not supported.");
                 }
 
-                switch (DataFormat)
-                {
-                    case GvrDataFormat.Index4:
-
-                        Pixels = new byte[(Width * Height) >> 1];
-                        fs.Read(Pixels, 0, Pixels.Length);
-                        break;
-
-                    case GvrDataFormat.Index8:
-
-                        Pixels = new byte[Width * Height];
-                        fs.Read(Pixels, 0, Pixels.Length);
-                        break;
-
-                    default:
-
-                        throw new NotImplementedException($"\"{gvrPath}\" has an unsupported data format: {DataFormat}.");
-                }
+                ImageDataFormat format = ImageDataFormat.Get(Width, Height, DataFormat);
+                Pixels = format.Decode(fs);
             }
 
             if (HasExternalPalette)
@@ -181,68 +167,12 @@ namespace GvrTool
             Width = tga.Width;
             Height = tga.Height;
 
-            switch (DataFormat)
-            {
-                case GvrDataFormat.Index4:
-                {
-                    if (tga.Header.ImageSpec.PixelDepth != TgaPixelDepth.Bpp8)
-                    {
-                        throw new InvalidDataException($"TGA file PixelDepth is {tga.Header.ImageSpec.PixelDepth} but {TgaPixelDepth.Bpp8} is expected.");
-                    }
+            Pixels = tga.ImageOrColorMapArea.ImageData;
 
-                    int offset = 0;
-                    byte[] tgaPixels = tga.ImageOrColorMapArea.ImageData;
-                    Pixels = new byte[(Width * Height) >> 1];
-
-                    for (int y = 0; y < Height; y += 8)
-                    {
-                        for (int x = 0; x < Width; x += 8)
-                        {
-                            for (int y2 = 0; y2 < 8; y2++)
-                            {
-                                for (int x2 = 0; x2 < 8; x2++)
-                                {
-                                    byte entry = (byte)(tgaPixels[((y + y2) * Width) + (x + x2)] & 0x0F);
-                                    entry = (byte)((Pixels[offset] & (0x0F << (x2 & 0x01) * 4)) | (entry << ((~x2 & 0x01) * 4)));
-
-                                    Pixels[offset] = entry;
-
-                                    if ((x2 & 0x01) != 0) offset++;
-                                }
-                            }
-                        }
-                    }
-
-                    break;
-                }
-                case GvrDataFormat.Index8:
-                {
-                    int offset = 0;
-                    byte[] tgaPixels = tga.ImageOrColorMapArea.ImageData;
-                    Pixels = new byte[Width * Height];
-
-                    for (int y = 0; y < Height; y += 4)
-                    {
-                        for (int x = 0; x < Width; x += 8)
-                        {
-                            for (int y2 = 0; y2 < 4; y2++)
-                            {
-                                for (int x2 = 0; x2 < 8; x2++)
-                                {
-                                    Pixels[offset] = tgaPixels[((y + y2) * Width) + (x + x2)];
-                                    offset++;
-                                }
-                            }
-                        }
-                    }
-
-                    break;
-                }
-                default:
-                {
-                    throw new NotImplementedException($"GVR has an unsupported data format: {DataFormat}.");
-                }
-            }
+            //if (tga.Header.ImageSpec.PixelDepth != TgaPixelDepth.Bpp8)
+            //{
+            //    throw new InvalidDataException($"TGA file PixelDepth is {tga.Header.ImageSpec.PixelDepth} but {TgaPixelDepth.Bpp8} is expected.");
+            //}
 
             if (HasExternalPalette)
             {
@@ -335,63 +265,7 @@ namespace GvrTool
 
             TgaColorMapEntrySize tgaColorMapEntrySize = TgaColorMapEntrySize.Other;
             byte tgaAlphaChannelBits = 0;
-            byte[] tgaPixels = null;
             byte[] tgaPalette = null;
-
-            switch (DataFormat)
-            {
-                case GvrDataFormat.Index4:
-                {
-                    int offset = 0;
-                    tgaPixels = new byte[Width * Height];
-
-                    for (int y = 0; y < Height; y += 8)
-                    {
-                        for (int x = 0; x < Width; x += 8)
-                        {
-                            for (int y2 = 0; y2 < 8; y2++)
-                            {
-                                for (int x2 = 0; x2 < 8; x2++)
-                                {
-                                    byte entry = (byte)((Pixels[offset] >> ((~x2 & 0x01) * 4)) & 0x0F);
-
-                                    tgaPixels[(((y + y2) * Width) + (x + x2))] = entry;
-
-                                    if ((x2 & 0x01) != 0) offset++;
-                                }
-                            }
-                        }
-                    }
-
-                    break;
-                }
-                case GvrDataFormat.Index8:
-                {
-                    int offset = 0;
-                    tgaPixels = new byte[Width * Height];
-
-                    for (int y = 0; y < Height; y += 4)
-                    {
-                        for (int x = 0; x < Width; x += 8)
-                        {
-                            for (int y2 = 0; y2 < 4; y2++)
-                            {
-                                for (int x2 = 0; x2 < 8; x2++)
-                                {
-                                    tgaPixels[(((y + y2) * Width) + (x + x2))] = Pixels[offset];
-                                    offset++;
-                                }
-                            }
-                        }
-                    }
-
-                    break;
-                }
-                default:
-                {
-                    throw new NotImplementedException($"GVR has an unsupported data format: {DataFormat}.");
-                }
-            }
 
             if (Palette != null)
             {
@@ -458,7 +332,7 @@ namespace GvrTool
             tga.Header.ImageSpec.Y_Origin = Height;
             tga.Header.ColorMapSpec.ColorMapEntrySize = tgaColorMapEntrySize;
             tga.Header.ColorMapSpec.ColorMapLength = PaletteEntryCount;
-            tga.ImageOrColorMapArea.ImageData = tgaPixels;
+            tga.ImageOrColorMapArea.ImageData = Pixels;
             tga.ImageOrColorMapArea.ColorMapData = tgaPalette;
 
             tga.Save(tgaFilePath);
@@ -489,24 +363,7 @@ namespace GvrTool
                 throw new ArgumentNullException(nameof(gvrFilePath));
             }
 
-            uint gvrtDataSize;
-
-            switch (DataFormat)
-            {
-                case GvrDataFormat.Index4:
-
-                    gvrtDataSize = (uint)((Width * Height) >> 1) + 8;
-                    break;
-
-                case GvrDataFormat.Index8:
-
-                    gvrtDataSize = (uint)(Width * Height) + 8;
-                    break;
-
-                default:
-
-                    throw new NotImplementedException($"GVR has an unsupported data format: {DataFormat}.");
-            }
+            ImageDataFormat format = ImageDataFormat.Get(Width, Height, DataFormat);
 
             using (FileStream fs = File.OpenWrite(gvrFilePath))
             using (BinaryWriter bw = new BinaryWriter(fs))
@@ -517,25 +374,15 @@ namespace GvrTool
                 bw.WriteEndian(Unknown1, BIG_ENDIAN);
 
                 bw.Write(GVRT_MAGIC);
-                bw.Write(gvrtDataSize);
+                bw.Write(format.EncodedDataLength + 8);
                 bw.WriteEndian(0x0, BIG_ENDIAN); //TODO: ???
                 bw.Write((byte)(((byte)PixelFormat << 4) | ((byte)DataFlags & 0xF)));
                 bw.Write((byte)DataFormat);
                 bw.WriteEndian(Width, BIG_ENDIAN);
                 bw.WriteEndian(Height, BIG_ENDIAN);
 
-                switch (DataFormat)
-                {
-                    case GvrDataFormat.Index4:
-                    case GvrDataFormat.Index8:
-
-                        fs.Write(Pixels, 0, Pixels.Length);
-                        break;
-
-                    default:
-
-                        throw new NotImplementedException($"GVR has an unsupported data format: {DataFormat}.");
-                }
+                byte[] gvrtPixels = format.Encode(Pixels);
+                fs.Write(gvrtPixels, 0, gvrtPixels.Length);
             }
 
             if (HasExternalPalette)
