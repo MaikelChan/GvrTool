@@ -19,32 +19,38 @@ namespace GvrTool
             try
             {
 #endif
-            switch (args[0])
-            {
-                case "-d":
-                case "--decode":
+                switch (args[0])
                 {
-                    GVR gvr = new GVR();
-                    gvr.LoadFromGvrFile(args[1]);
-                    gvr.SaveToTgaFile(args[2]);
+                    case "-d":
+                    case "--decode":
+                    {
+                        GVR gvr = new GVR();
+                        gvr.LoadFromGvrFile(args[1]);
+                        gvr.SaveToTgaFile(args[2]);
 
-                    break;
-                }
-                case "-e":
-                case "--encode":
-                {
-                    GVR gvr = new GVR();
-                    gvr.LoadFromTgaFile(args[1]);
-                    gvr.SaveToGvrFile(args[2]);
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"\"{args[1]}\" has been decoded successfully!");
 
-                    break;
+                        break;
+                    }
+                    case "-e":
+                    case "--encode":
+                    {
+                        GVR gvr = new GVR();
+                        gvr.LoadFromTgaFile(args[1]);
+                        gvr.SaveToGvrFile(args[2]);
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"\"{args[1]}\" has been encoded successfully!");
+
+                        break;
+                    }
+                    default:
+                    {
+                        ShowUsage();
+                        return;
+                    }
                 }
-                default:
-                {
-                    ShowUsage();
-                    return;
-                }
-            }
 #if !DEBUG
             }
             catch (Exception ex)
@@ -53,6 +59,8 @@ namespace GvrTool
                 Console.WriteLine(ex.Message);
             }
 #endif
+
+            Console.ForegroundColor = ConsoleColor.Gray;
         }
 
         static void ShowHeader()
