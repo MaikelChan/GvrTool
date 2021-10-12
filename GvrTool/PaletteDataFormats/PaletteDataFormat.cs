@@ -9,7 +9,6 @@ namespace GvrTool.PaletteDataFormats
         public ushort PaletteEntryCount { get; set; }
 
         public abstract TgaColorMapEntrySize TgaColorMapEntrySize { get; }
-        public abstract byte TgaAlphaChannelBits { get; }
 
         public abstract uint DecodedDataLength { get; }
         public abstract uint EncodedDataLength { get; }

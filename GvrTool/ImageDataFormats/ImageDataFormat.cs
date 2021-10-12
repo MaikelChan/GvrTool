@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using TGASharpLib;
 
 namespace GvrTool.ImageDataFormats
 {
@@ -10,6 +11,10 @@ namespace GvrTool.ImageDataFormats
 
         public abstract uint DecodedDataLength { get; }
         public abstract uint EncodedDataLength { get; }
+
+        public abstract TgaPixelDepth TgaPixelDepth { get; }
+        public abstract TgaImageType TgaImageType { get; }
+        public abstract byte TgaAlphaChannelBits { get; }
 
         public byte[] Decode(Stream inputStream)
         {
@@ -44,6 +49,8 @@ namespace GvrTool.ImageDataFormats
                     return new I4_ImageDataFormat(width, height);
                 case GvrDataFormat.Index8:
                     return new I8_ImageDataFormat(width, height);
+                case GvrDataFormat.Dxt1:
+                    return new Dxt1_ImageDataFormat(width, height);
                 default:
                     throw new NotImplementedException($"Unsupported image data format: {format}.");
             }

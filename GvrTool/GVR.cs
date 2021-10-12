@@ -89,11 +89,6 @@ namespace GvrTool
                     throw new NotImplementedException($"Textures with mip maps are not supported.");
                 }
 
-                if (!HasExternalPalette)
-                {
-                    throw new NotImplementedException($"Textures without external palette are not supported.");
-                }
-
                 ImageDataFormat format = ImageDataFormat.Get(Width, Height, DataFormat);
                 Pixels = format.Decode(fs);
             }
@@ -194,16 +189,22 @@ namespace GvrTool
                 throw new ArgumentNullException(nameof(tgaFilePath));
             }
 
-            PaletteDataFormat paletteFormat = PaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
+            ImageDataFormat imageFormat = ImageDataFormat.Get(Width, Height, DataFormat);
 
-            TGA tga = new TGA(Width, Height, TgaPixelDepth.Bpp8, TgaImageType.Uncompressed_ColorMapped);
+            TGA tga = new TGA(Width, Height, imageFormat.TgaPixelDepth, imageFormat.TgaImageType);
             tga.Header.ImageSpec.ImageDescriptor.ImageOrigin = TgaImgOrigin.TopLeft;
-            tga.Header.ImageSpec.ImageDescriptor.AlphaChannelBits = paletteFormat.TgaAlphaChannelBits;
+            tga.Header.ImageSpec.ImageDescriptor.AlphaChannelBits = imageFormat.TgaAlphaChannelBits;
             tga.Header.ImageSpec.Y_Origin = Height;
-            tga.Header.ColorMapSpec.ColorMapEntrySize = paletteFormat.TgaColorMapEntrySize;
-            tga.Header.ColorMapSpec.ColorMapLength = PaletteEntryCount;
             tga.ImageOrColorMapArea.ImageData = Pixels;
-            tga.ImageOrColorMapArea.ColorMapData = Palette;
+
+            if (HasPalette)
+            {
+                PaletteDataFormat paletteFormat = PaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
+
+                tga.Header.ColorMapSpec.ColorMapEntrySize = paletteFormat.TgaColorMapEntrySize;
+                tga.Header.ColorMapSpec.ColorMapLength = PaletteEntryCount;
+                tga.ImageOrColorMapArea.ColorMapData = Palette;
+            }
 
             tga.Save(tgaFilePath);
 
@@ -245,7 +246,7 @@ namespace GvrTool
 
                 bw.Write(GVRT_MAGIC);
                 bw.Write(format.EncodedDataLength + 8);
-                bw.WriteEndian(0x0, BIG_ENDIAN); //TODO: ???
+                bw.WriteEndian((ushort)0x0, BIG_ENDIAN); //TODO: ???
                 bw.Write((byte)(((byte)PixelFormat << 4) | ((byte)DataFlags & 0xF)));
                 bw.Write((byte)DataFormat);
                 bw.WriteEndian(Width, BIG_ENDIAN);

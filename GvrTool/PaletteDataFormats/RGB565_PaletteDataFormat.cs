@@ -8,7 +8,6 @@ namespace GvrTool.PaletteDataFormats
         public override uint EncodedDataLength => (uint)(PaletteEntryCount * 2);
 
         public override TgaColorMapEntrySize TgaColorMapEntrySize => TgaColorMapEntrySize.R8G8B8;
-        public override byte TgaAlphaChannelBits => 0;
 
         public RGB565_PaletteDataFormat(ushort paletteEntryCount) : base(paletteEntryCount)
         {
