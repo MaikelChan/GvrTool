@@ -134,7 +134,12 @@ namespace GvrTool
 
             if (!File.Exists(tgaFilePath))
             {
-                throw new FileNotFoundException($"TGA file has not been found: {tgaFilePath}.");
+                throw new FileNotFoundException($"\"{tgaFilePath}\" TGA file has not been found.");
+            }
+
+            if (!Path.GetExtension(tgaFilePath).Equals(".tga", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException($"{tgaFilePath} is not a valid TGA file.");
             }
 
             GVRMetadata metadata = GVRMetadata.LoadMetadataFromJson(Path.ChangeExtension(tgaFilePath, ".json"));
