@@ -118,8 +118,7 @@ namespace GvrTool
                     uint gvplMagic = br.ReadUInt32();
                     if (gvplMagic != GVPL_MAGIC)
                     {
-                        Console.WriteLine($"\"{gvpPath}\" is not a valid GVPL file.");
-                        return;
+                        throw new InvalidDataException($"\"{gvpPath}\" is not a valid GVPL file.");
                     }
 
                     fs.Position = 0x9;
@@ -139,8 +138,7 @@ namespace GvrTool
 
                         default:
 
-                            Console.WriteLine($"\"{gvpPath}\" has an unsupported palette pixel format: {PalettePixelFormat}.");
-                            return;
+                            throw new NotImplementedException($"\"{gvpPath}\" has an unsupported palette pixel format: {PalettePixelFormat}.");
                     }
                 }
             }
@@ -485,8 +483,7 @@ namespace GvrTool
 
                         default:
 
-                            Console.WriteLine($"GVP has an unsupported palette pixel format: {PalettePixelFormat}.");
-                            return;
+                            throw new NotImplementedException($"GVP has an unsupported palette pixel format: {PalettePixelFormat}.");
                     }
                 }
             }
