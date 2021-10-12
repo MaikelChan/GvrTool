@@ -1,4 +1,5 @@
 ﻿using GvrTool.ImageDataFormats;
+using GvrTool.PaletteDataFormats;
 using System;
 using System.IO;
 using TGASharpLib;
@@ -121,19 +122,8 @@ namespace GvrTool
                     fs.Position = 0xe;
                     PaletteEntryCount = br.ReadUInt16Endian(BIG_ENDIAN);
 
-                    switch (PalettePixelFormat)
-                    {
-                        case GvrPixelFormat.Rgb5a3:
-                        case GvrPixelFormat.Rgb565:
-
-                            Palette = new byte[PaletteEntryCount << 1];
-                            fs.Read(Palette, 0, Palette.Length);
-                            break;
-
-                        default:
-
-                            throw new NotImplementedException($"\"{gvpPath}\" has an unsupported palette pixel format: {PalettePixelFormat}.");
-                    }
+                    PaletteDataFormat format = PaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
+                    Palette = format.Decode(fs);
                 }
             }
 
@@ -176,76 +166,17 @@ namespace GvrTool
 
             if (HasExternalPalette)
             {
-                switch (PalettePixelFormat)
-                {
-                    case GvrPixelFormat.Rgb5a3:
-                    {
-                        if (tga.Header.ColorMapSpec.ColorMapEntrySize != TgaColorMapEntrySize.A8R8G8B8)
-                        {
-                            throw new InvalidDataException($"TGA file ColorMapEntrySize is {tga.Header.ColorMapSpec.ColorMapEntrySize} but {TgaColorMapEntrySize.A8R8G8B8} is expected.");
-                        }
+                //if (tga.Header.ColorMapSpec.ColorMapEntrySize != TgaColorMapEntrySize.A8R8G8B8)
+                //{
+                //    throw new InvalidDataException($"TGA file ColorMapEntrySize is {tga.Header.ColorMapSpec.ColorMapEntrySize} but {TgaColorMapEntrySize.A8R8G8B8} is expected.");
+                //}
 
-                        Palette = new byte[PaletteEntryCount * 2];
-                        byte[] tgaPalette = tga.ImageOrColorMapArea.ColorMapData;
-                        uint tgaPaletteOffset = 0;
+                //if (tga.Header.ColorMapSpec.ColorMapEntrySize != TgaColorMapEntrySize.R8G8B8)
+                //{
+                //    throw new InvalidDataException($"TGA file ColorMapEntrySize is {tga.Header.ColorMapSpec.ColorMapEntrySize} but {TgaColorMapEntrySize.R8G8B8} is expected.");
+                //}
 
-                        for (int p = 0; p < Palette.Length; p += 2)
-                        {
-                            ushort color = 0x0;
-
-                            if (tgaPalette[tgaPaletteOffset + 3] > 0xDA) // Rgb555
-                            {
-                                color |= 0x8000;
-                                color |= (ushort)((tgaPalette[tgaPaletteOffset + 2] >> 3) << 10);
-                                color |= (ushort)((tgaPalette[tgaPaletteOffset + 1] >> 3) << 5);
-                                color |= (ushort)((tgaPalette[tgaPaletteOffset + 0] >> 3) << 0);
-                            }
-                            else // Argb3444
-                            {
-                                color |= (ushort)((tgaPalette[tgaPaletteOffset + 3] >> 5) << 12);
-                                color |= (ushort)((tgaPalette[tgaPaletteOffset + 2] >> 4) << 8);
-                                color |= (ushort)((tgaPalette[tgaPaletteOffset + 1] >> 4) << 4);
-                                color |= (ushort)((tgaPalette[tgaPaletteOffset + 0] >> 4) << 0);
-                            }
-
-                            Palette[p + 0] = (byte)(color >> 8);
-                            Palette[p + 1] = (byte)(color & 0b0000_0000_1111_1111);
-
-                            tgaPaletteOffset += 4;
-                        }
-
-                        break;
-                    }
-                    case GvrPixelFormat.Rgb565:
-                    {
-                        if (tga.Header.ColorMapSpec.ColorMapEntrySize != TgaColorMapEntrySize.R8G8B8)
-                        {
-                            throw new InvalidDataException($"TGA file ColorMapEntrySize is {tga.Header.ColorMapSpec.ColorMapEntrySize} but {TgaColorMapEntrySize.R8G8B8} is expected.");
-                        }
-
-                        Palette = new byte[PaletteEntryCount * 2];
-                        byte[] tgaPalette = tga.ImageOrColorMapArea.ColorMapData;
-                        uint tgaPaletteOffset = 0;
-
-                        for (int p = 0; p < Palette.Length; p += 2)
-                        {
-                            ushort color = 0x0;
-                            color |= (ushort)((tgaPalette[tgaPaletteOffset + 2] >> 3) << 11);
-                            color |= (ushort)((tgaPalette[tgaPaletteOffset + 1] >> 2) << 5);
-                            color |= (ushort)((tgaPalette[tgaPaletteOffset + 0] >> 3) << 0);
-
-                            Palette[p + 0] = (byte)(color >> 8);
-                            Palette[p + 1] = (byte)(color & 0b0000_0000_1111_1111);
-
-                            tgaPaletteOffset += 3;
-                        }
-
-                        break;
-                    }
-                    default:
-
-                        throw new NotImplementedException($"GVP has an unsupported palette pixel format: {PalettePixelFormat}.");
-                }
+                Palette = tga.ImageOrColorMapArea.ColorMapData;
             }
 
             isLoaded = true;
@@ -263,77 +194,16 @@ namespace GvrTool
                 throw new ArgumentNullException(nameof(tgaFilePath));
             }
 
-            TgaColorMapEntrySize tgaColorMapEntrySize = TgaColorMapEntrySize.Other;
-            byte tgaAlphaChannelBits = 0;
-            byte[] tgaPalette = null;
-
-            if (Palette != null)
-            {
-                int paletteOffset = 0;
-
-                switch (PalettePixelFormat)
-                {
-                    case GvrPixelFormat.Rgb5a3:
-
-                        tgaColorMapEntrySize = TgaColorMapEntrySize.A8R8G8B8;
-                        tgaAlphaChannelBits = 8;
-                        tgaPalette = new byte[PaletteEntryCount * 4];
-
-                        for (int p = 0; p < tgaPalette.Length; p += 4)
-                        {
-                            ushort entry = (ushort)((Palette[paletteOffset] << 8) | Palette[paletteOffset + 1]);
-                            paletteOffset += 2;
-
-                            if ((entry & 0b1000_0000_0000_0000) != 0) // Rgb555
-                            {
-                                tgaPalette[p + 3] = 255;
-                                tgaPalette[p + 2] = (byte)(((entry >> 10) & 0b0000_0000_0001_1111) * (255 / 31));
-                                tgaPalette[p + 1] = (byte)(((entry >> 05) & 0b0000_0000_0001_1111) * (255 / 31));
-                                tgaPalette[p + 0] = (byte)(((entry >> 00) & 0b0000_0000_0001_1111) * (255 / 31));
-                            }
-                            else // Argb3444
-                            {
-                                tgaPalette[p + 3] = (byte)(((entry >> 12) & 0b0000_0000_0000_0111) * (255 / 7));
-                                tgaPalette[p + 2] = (byte)(((entry >> 08) & 0b0000_0000_0000_1111) * (255 / 15));
-                                tgaPalette[p + 1] = (byte)(((entry >> 04) & 0b0000_0000_0000_1111) * (255 / 15));
-                                tgaPalette[p + 0] = (byte)(((entry >> 00) & 0b0000_0000_0000_1111) * (255 / 15));
-                            }
-                        }
-
-                        break;
-
-                    case GvrPixelFormat.Rgb565:
-
-                        tgaColorMapEntrySize = TgaColorMapEntrySize.R8G8B8;
-                        tgaAlphaChannelBits = 0;
-                        tgaPalette = new byte[PaletteEntryCount * 3];
-
-                        for (int p = 0; p < tgaPalette.Length; p += 3)
-                        {
-                            ushort entry = (ushort)((Palette[paletteOffset] << 8) | Palette[paletteOffset + 1]);
-                            paletteOffset += 2;
-
-                            tgaPalette[p + 2] = (byte)(((entry >> 11) & 0b0000_0000_0001_1111) * (255 / 31));
-                            tgaPalette[p + 1] = (byte)(((entry >> 05) & 0b0000_0000_0011_1111) * (255 / 63));
-                            tgaPalette[p + 0] = (byte)(((entry >> 00) & 0b0000_0000_0001_1111) * (255 / 31));
-                        }
-
-                        break;
-
-                    default:
-
-                        throw new NotImplementedException($"GVP has an unsupported palette pixel format: {PalettePixelFormat}.");
-                }
-            }
+            PaletteDataFormat paletteFormat = PaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
 
             TGA tga = new TGA(Width, Height, TgaPixelDepth.Bpp8, TgaImageType.Uncompressed_ColorMapped);
             tga.Header.ImageSpec.ImageDescriptor.ImageOrigin = TgaImgOrigin.TopLeft;
-            tga.Header.ImageSpec.ImageDescriptor.AlphaChannelBits = tgaAlphaChannelBits;
+            tga.Header.ImageSpec.ImageDescriptor.AlphaChannelBits = paletteFormat.TgaAlphaChannelBits;
             tga.Header.ImageSpec.Y_Origin = Height;
-            tga.Header.ColorMapSpec.ColorMapEntrySize = tgaColorMapEntrySize;
+            tga.Header.ColorMapSpec.ColorMapEntrySize = paletteFormat.TgaColorMapEntrySize;
             tga.Header.ColorMapSpec.ColorMapLength = PaletteEntryCount;
             tga.ImageOrColorMapArea.ImageData = Pixels;
-            tga.ImageOrColorMapArea.ColorMapData = tgaPalette;
+            tga.ImageOrColorMapArea.ColorMapData = Palette;
 
             tga.Save(tgaFilePath);
 
@@ -389,29 +259,21 @@ namespace GvrTool
             {
                 string gvpFilePath = Path.ChangeExtension(gvrFilePath, ".gvp");
 
+                PaletteDataFormat paletteFormat = PaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
+
                 using (FileStream fs = File.OpenWrite(gvpFilePath))
                 using (BinaryWriter bw = new BinaryWriter(fs))
                 {
                     bw.Write(GVPL_MAGIC);
-                    bw.Write((uint)((PaletteEntryCount << 1) + 0x8)); // Chunk content size
+                    bw.Write(paletteFormat.EncodedDataLength + 8);
                     bw.Write((byte)0); // TODO: ???
                     bw.Write((byte)PalettePixelFormat);
                     bw.WriteEndian(0x00ff, BIG_ENDIAN); // TODO: ???
                     bw.WriteEndian(0x0000, BIG_ENDIAN); // TODO: ???
                     bw.WriteEndian(PaletteEntryCount, BIG_ENDIAN); // TODO: ???
 
-                    switch (PalettePixelFormat)
-                    {
-                        case GvrPixelFormat.Rgb5a3:
-                        case GvrPixelFormat.Rgb565:
-
-                            fs.Write(Palette, 0, Palette.Length);
-                            break;
-
-                        default:
-
-                            throw new NotImplementedException($"GVP has an unsupported palette pixel format: {PalettePixelFormat}.");
-                    }
+                    byte[] palette = paletteFormat.Encode(Palette);
+                    fs.Write(palette, 0, palette.Length);
                 }
             }
         }

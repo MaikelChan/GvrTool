@@ -12,14 +12,6 @@ namespace GvrTool.ImageDataFormats
 
         }
 
-        public override byte[] Decode(Stream inputStream)
-        {
-            byte[] input = new byte[EncodedDataLength];
-            inputStream.Read(input, 0, input.Length);
-
-            return Decode(input);
-        }
-
         public override byte[] Decode(byte[] input)
         {
             byte[] output = new byte[DecodedDataLength];
@@ -43,18 +35,10 @@ namespace GvrTool.ImageDataFormats
             return output;
         }
 
-        public override byte[] Encode(Stream inputStream)
-        {
-            byte[] input = new byte[DecodedDataLength];
-            inputStream.Read(input, 0, input.Length);
-
-            return Encode(input);
-        }
-
         public override byte[] Encode(byte[] input)
         {
-            int offset = 0;
             byte[] output = new byte[EncodedDataLength];
+            int offset = 0;
 
             for (int y = 0; y < Height; y += 4)
             {

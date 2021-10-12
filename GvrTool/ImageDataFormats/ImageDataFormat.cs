@@ -11,10 +11,23 @@ namespace GvrTool.ImageDataFormats
         public abstract uint DecodedDataLength { get; }
         public abstract uint EncodedDataLength { get; }
 
-        public abstract byte[] Decode(Stream inputStream);
-        public abstract byte[] Decode(byte[] input);
+        public byte[] Decode(Stream inputStream)
+        {
+            byte[] input = new byte[EncodedDataLength];
+            inputStream.Read(input, 0, input.Length);
 
-        public abstract byte[] Encode(Stream inputStream);
+            return Decode(input);
+        }
+
+        public byte[] Encode(Stream inputStream)
+        {
+            byte[] input = new byte[DecodedDataLength];
+            inputStream.Read(input, 0, input.Length);
+
+            return Encode(input);
+        }
+
+        public abstract byte[] Decode(byte[] input);
         public abstract byte[] Encode(byte[] input);
 
         public ImageDataFormat(ushort width, ushort height)
