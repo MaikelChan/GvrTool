@@ -49,6 +49,10 @@ namespace GvrTool.ImageDataFormats
                     return new I4_ImageDataFormat(width, height);
                 case GvrDataFormat.Index8:
                     return new I8_ImageDataFormat(width, height);
+                case GvrDataFormat.Rgb5a3:
+                    return new RGB5A3_ImageDataFormat(width, height);
+                case GvrDataFormat.Argb8888:
+                    return new ARGB8888_ImageDataFormat(width, height);
                 case GvrDataFormat.Dxt1:
                     return new Dxt1_ImageDataFormat(width, height);
                 default:

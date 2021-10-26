@@ -16,6 +16,8 @@ namespace GvrTool.Tests
         [DataRow("0000.gvr")] // ImageData: I4, PaletteData: RGB5A3   - Resident Evil: Code Veronica (GameCube)
         [DataRow("0001.gvr")] // ImageData: I4, PaletteData: RGB565   - Resident Evil: Code Veronica (GameCube)
         [DataRow("0002.gvr")] // ImageData: I8, PaletteData: RGB5A3   - Resident Evil: Code Veronica (GameCube)
+        [DataRow("0004.gvr")] // ImageData: RGB5A3                    - Resident Evil: Code Veronica (GameCube)
+        [DataRow("0005.gvr")] // ImageData: ARGB8888                  - Resident Evil: Code Veronica (GameCube)
         public void RegenerateAndCheckIfEqual(string testFileName)
         {
             using (MD5 md5 = MD5.Create())
