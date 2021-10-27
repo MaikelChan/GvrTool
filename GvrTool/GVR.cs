@@ -21,6 +21,10 @@ namespace GvrTool
         public GvrPixelFormat PalettePixelFormat { get; private set; }
         public ushort PaletteEntryCount { get; private set; }
 
+        public byte ExternalPaletteUnknown1 { get; private set; }
+        public ushort ExternalPaletteUnknown2 { get; private set; }
+        public ushort ExternalPaletteUnknown3 { get; private set; }
+
         public byte[] Pixels { get; private set; }
         public byte[] Palette { get; private set; }
 
@@ -111,10 +115,11 @@ namespace GvrTool
                         throw new InvalidDataException($"\"{gvpPath}\" is not a valid GVPL file.");
                     }
 
-                    fs.Position = 0x9;
+                    fs.Position = 0x8;
+                    ExternalPaletteUnknown1 = br.ReadByte();
                     PalettePixelFormat = (GvrPixelFormat)br.ReadByte();
-
-                    fs.Position = 0xe;
+                    ExternalPaletteUnknown2 = br.ReadUInt16Endian(BIG_ENDIAN);
+                    ExternalPaletteUnknown3 = br.ReadUInt16Endian(BIG_ENDIAN);
                     PaletteEntryCount = br.ReadUInt16Endian(BIG_ENDIAN);
 
                     PaletteDataFormat format = PaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
@@ -151,6 +156,9 @@ namespace GvrTool
             DataFormat = metadata.DataFormat;
             PalettePixelFormat = metadata.PalettePixelFormat;
             PaletteEntryCount = metadata.PaletteEntryCount;
+            ExternalPaletteUnknown1 = metadata.ExternalPaletteUnknown1;
+            ExternalPaletteUnknown2 = metadata.ExternalPaletteUnknown2;
+            ExternalPaletteUnknown3 = metadata.ExternalPaletteUnknown3;
 
             TGA tga = new TGA(tgaFilePath);
 
@@ -236,7 +244,10 @@ namespace GvrTool
                 DataFlags = DataFlags,
                 DataFormat = DataFormat,
                 PalettePixelFormat = PalettePixelFormat,
-                PaletteEntryCount = PaletteEntryCount
+                PaletteEntryCount = PaletteEntryCount,
+                ExternalPaletteUnknown1 = ExternalPaletteUnknown1,
+                ExternalPaletteUnknown2 = ExternalPaletteUnknown2,
+                ExternalPaletteUnknown3 = ExternalPaletteUnknown3
             };
 
             GVRMetadata.SaveMetadataToJson(metadata, Path.ChangeExtension(tgaFilePath, ".json"));
@@ -287,11 +298,11 @@ namespace GvrTool
                 {
                     bw.Write(GVPL_MAGIC);
                     bw.Write(paletteFormat.EncodedDataLength + 8);
-                    bw.Write((byte)0); // TODO: ???
+                    bw.Write(ExternalPaletteUnknown1);
                     bw.Write((byte)PalettePixelFormat);
-                    bw.WriteEndian(0x00ff, BIG_ENDIAN); // TODO: ???
-                    bw.WriteEndian(0x0000, BIG_ENDIAN); // TODO: ???
-                    bw.WriteEndian(PaletteEntryCount, BIG_ENDIAN); // TODO: ???
+                    bw.WriteEndian(ExternalPaletteUnknown2, BIG_ENDIAN);
+                    bw.WriteEndian(ExternalPaletteUnknown3, BIG_ENDIAN);
+                    bw.WriteEndian(PaletteEntryCount, BIG_ENDIAN);
 
                     byte[] palette = paletteFormat.Encode(Palette);
                     fs.Write(palette, 0, palette.Length);

@@ -17,7 +17,11 @@ namespace GvrTool
         public GvrPixelFormat PalettePixelFormat { get; set; }
         public ushort PaletteEntryCount { get; set; }
 
-        const uint METADATA_VERSION = 1;
+        public byte ExternalPaletteUnknown1 { get; set; }
+        public ushort ExternalPaletteUnknown2 { get; set; }
+        public ushort ExternalPaletteUnknown3 { get; set; }
+
+        const uint METADATA_VERSION = 2;
 
         public static void SaveMetadataToJson(GVRMetadata metadata, string jsonFilePath)
         {
