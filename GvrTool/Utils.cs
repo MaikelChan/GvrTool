@@ -52,7 +52,7 @@ namespace GvrTool
 
             for (int y = 0; y < height; y++)
             {
-                Array.Copy(input, (height - 1 - y) * width, output, y * width, bytesPerRow);
+                Array.Copy(input, (height - 1 - y) * width * bytesPerPixel, output, y * width * bytesPerPixel, bytesPerRow);
             }
 
             return output;
