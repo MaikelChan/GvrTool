@@ -9,14 +9,16 @@ namespace GvrTool.Pvr.ImageDataFormats
 
         }
 
-        public static PvrImageDataFormat Get(ushort width, ushort height, PvrDataFormat format)
+        public static PvrImageDataFormat Get(ushort width, ushort height, PvrDataFormat dataFormat, PvrPixelFormat pixelFormat)
         {
-            switch (format)
+            switch (dataFormat)
             {
                 case PvrDataFormat.Index8:
                     return new I8_PvrImageDataFormat(width, height);
+                case PvrDataFormat.SquareTwiddled:
+                    return new SquareTwiddled_PvrImageDataFormat(width, height, pixelFormat);
                 default:
-                    throw new NotImplementedException($"Unsupported PVR image data format: {format}.");
+                    throw new NotImplementedException($"Unsupported PVR image data format: {dataFormat}.");
             }
         }
 

@@ -104,7 +104,7 @@ namespace GvrTool.Pvr
                     throw new NotImplementedException($"Textures with mip maps are not supported.");
                 }
 
-                PvrImageDataFormat format = PvrImageDataFormat.Get(Width, Height, DataFormat);
+                PvrImageDataFormat format = PvrImageDataFormat.Get(Width, Height, DataFormat, PixelFormat);
                 Pixels = format.Decode(fs);
             }
 
@@ -225,7 +225,7 @@ namespace GvrTool.Pvr
                 throw new ArgumentNullException(nameof(tgaFilePath));
             }
 
-            PvrImageDataFormat imageFormat = PvrImageDataFormat.Get(Width, Height, DataFormat);
+            PvrImageDataFormat imageFormat = PvrImageDataFormat.Get(Width, Height, DataFormat, PixelFormat);
 
             TGA tga = new TGA(Width, Height, imageFormat.TgaPixelDepth, imageFormat.TgaImageType);
             tga.Header.ImageSpec.ImageDescriptor.ImageOrigin = TgaImgOrigin.TopLeft;
@@ -271,7 +271,7 @@ namespace GvrTool.Pvr
                 throw new ArgumentNullException(nameof(pvrFilePath));
             }
 
-            PvrImageDataFormat format = PvrImageDataFormat.Get(Width, Height, DataFormat);
+            PvrImageDataFormat format = PvrImageDataFormat.Get(Width, Height, DataFormat, PixelFormat);
 
             using (FileStream fs = File.OpenWrite(pvrFilePath))
             using (BinaryWriter bw = new BinaryWriter(fs))
