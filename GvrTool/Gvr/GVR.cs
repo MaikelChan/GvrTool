@@ -1,10 +1,10 @@
-﻿using GvrTool.ImageDataFormats;
-using GvrTool.PaletteDataFormats;
+﻿using GvrTool.Gvr.ImageDataFormats;
+using GvrTool.Gvr.PaletteDataFormats;
 using System;
 using System.IO;
 using TGASharpLib;
 
-namespace GvrTool
+namespace GvrTool.Gvr
 {
     public class GVR
     {
@@ -93,7 +93,7 @@ namespace GvrTool
                     throw new NotImplementedException($"Textures with mip maps are not supported.");
                 }
 
-                ImageDataFormat format = ImageDataFormat.Get(Width, Height, DataFormat);
+                GvrImageDataFormat format = GvrImageDataFormat.Get(Width, Height, DataFormat);
                 Pixels = format.Decode(fs);
             }
 
@@ -122,7 +122,7 @@ namespace GvrTool
                     ExternalPaletteUnknown3 = br.ReadUInt16Endian(BIG_ENDIAN);
                     PaletteEntryCount = br.ReadUInt16Endian(BIG_ENDIAN);
 
-                    PaletteDataFormat format = PaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
+                    GvrPaletteDataFormat format = GvrPaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
                     Palette = format.Decode(fs);
                 }
             }
@@ -217,7 +217,7 @@ namespace GvrTool
                 throw new ArgumentNullException(nameof(tgaFilePath));
             }
 
-            ImageDataFormat imageFormat = ImageDataFormat.Get(Width, Height, DataFormat);
+            GvrImageDataFormat imageFormat = GvrImageDataFormat.Get(Width, Height, DataFormat);
 
             TGA tga = new TGA(Width, Height, imageFormat.TgaPixelDepth, imageFormat.TgaImageType);
             tga.Header.ImageSpec.ImageDescriptor.ImageOrigin = TgaImgOrigin.TopLeft;
@@ -227,7 +227,7 @@ namespace GvrTool
 
             if (HasPalette)
             {
-                PaletteDataFormat paletteFormat = PaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
+                GvrPaletteDataFormat paletteFormat = GvrPaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
 
                 tga.Header.ColorMapSpec.ColorMapEntrySize = paletteFormat.TgaColorMapEntrySize;
                 tga.Header.ColorMapSpec.ColorMapLength = PaletteEntryCount;
@@ -265,7 +265,7 @@ namespace GvrTool
                 throw new ArgumentNullException(nameof(gvrFilePath));
             }
 
-            ImageDataFormat format = ImageDataFormat.Get(Width, Height, DataFormat);
+            GvrImageDataFormat format = GvrImageDataFormat.Get(Width, Height, DataFormat);
 
             using (FileStream fs = File.OpenWrite(gvrFilePath))
             using (BinaryWriter bw = new BinaryWriter(fs))
@@ -291,7 +291,7 @@ namespace GvrTool
             {
                 string gvpFilePath = Path.ChangeExtension(gvrFilePath, ".gvp");
 
-                PaletteDataFormat paletteFormat = PaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
+                GvrPaletteDataFormat paletteFormat = GvrPaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
 
                 using (FileStream fs = File.OpenWrite(gvpFilePath))
                 using (BinaryWriter bw = new BinaryWriter(fs))

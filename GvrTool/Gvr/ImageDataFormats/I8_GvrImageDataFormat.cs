@@ -1,9 +1,9 @@
 ﻿using System;
 using TGASharpLib;
 
-namespace GvrTool.ImageDataFormats
+namespace GvrTool.Gvr.ImageDataFormats
 {
-    class I8_ImageDataFormat : ImageDataFormat
+    class I8_GvrImageDataFormat : GvrImageDataFormat
     {
         public override uint DecodedDataLength => (uint)(Width * Height);
         public override uint EncodedDataLength => (uint)(Width * Height);
@@ -12,7 +12,7 @@ namespace GvrTool.ImageDataFormats
         public override TgaImageType TgaImageType => TgaImageType.Uncompressed_ColorMapped;
         public override byte TgaAlphaChannelBits => 0;
 
-        public I8_ImageDataFormat(ushort width, ushort height) : base(width, height)
+        public I8_GvrImageDataFormat(ushort width, ushort height) : base(width, height)
         {
 
         }

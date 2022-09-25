@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using TGASharpLib;
 
-namespace GvrTool.PaletteDataFormats
+namespace GvrTool
 {
     abstract class PaletteDataFormat
     {
@@ -35,19 +34,6 @@ namespace GvrTool.PaletteDataFormats
         public PaletteDataFormat(ushort paletteEntryCount)
         {
             PaletteEntryCount = paletteEntryCount;
-        }
-
-        public static PaletteDataFormat Get(ushort paletteEntryCount, GvrPixelFormat format)
-        {
-            switch (format)
-            {
-                case GvrPixelFormat.Rgb5a3:
-                    return new RGB5A3_PaletteDataFormat(paletteEntryCount);
-                case GvrPixelFormat.Rgb565:
-                    return new RGB565_PaletteDataFormat(paletteEntryCount);
-                default:
-                    throw new NotImplementedException($"Unsupported palette data format: {format}.");
-            }
         }
     }
 }

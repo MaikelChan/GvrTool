@@ -1,3 +1,4 @@
+using GvrTool.Gvr;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
@@ -7,7 +8,7 @@ using TGASharpLib;
 namespace GvrTool.Tests
 {
     [TestClass]
-    public class GvrToolTests
+    public class GvrTests
     {
         const string TEST_FILES_DIRECTORY = @"..\..\..\..\..\GVRs";
         const double THRESHOLD = 2d;
@@ -161,7 +162,7 @@ namespace GvrTool.Tests
             }
         }
 
-        bool CompareArrays(byte[] array1, byte[] array2)
+        static bool CompareArrays(byte[] array1, byte[] array2)
         {
             if (array1.Length != array2.Length) return false;
 

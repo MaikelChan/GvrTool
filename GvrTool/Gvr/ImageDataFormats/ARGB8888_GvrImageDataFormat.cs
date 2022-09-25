@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TGASharpLib;
+﻿using TGASharpLib;
 
-namespace GvrTool.ImageDataFormats
+namespace GvrTool.Gvr.ImageDataFormats
 {
-    class ARGB8888_ImageDataFormat : ImageDataFormat
+    class ARGB8888_GvrImageDataFormat : GvrImageDataFormat
     {
         public override uint DecodedDataLength => (uint)((Width * Height) << 2);
         public override uint EncodedDataLength => (uint)((Width * Height) << 2);
@@ -16,7 +11,7 @@ namespace GvrTool.ImageDataFormats
         public override TgaImageType TgaImageType => TgaImageType.Uncompressed_TrueColor;
         public override byte TgaAlphaChannelBits => 8;
 
-        public ARGB8888_ImageDataFormat(ushort width, ushort height) : base(width, height)
+        public ARGB8888_GvrImageDataFormat(ushort width, ushort height) : base(width, height)
         {
 
         }

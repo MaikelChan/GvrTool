@@ -1,15 +1,15 @@
 ﻿using TGASharpLib;
 
-namespace GvrTool.PaletteDataFormats
+namespace GvrTool.Gvr.PaletteDataFormats
 {
-    class RGB565_PaletteDataFormat : PaletteDataFormat
+    class RGB565_GvrPaletteDataFormat : GvrPaletteDataFormat
     {
         public override uint DecodedDataLength => (uint)(PaletteEntryCount * 3);
         public override uint EncodedDataLength => (uint)(PaletteEntryCount * 2);
 
         public override TgaColorMapEntrySize TgaColorMapEntrySize => TgaColorMapEntrySize.R8G8B8;
 
-        public RGB565_PaletteDataFormat(ushort paletteEntryCount) : base(paletteEntryCount)
+        public RGB565_GvrPaletteDataFormat(ushort paletteEntryCount) : base(paletteEntryCount)
         {
 
         }

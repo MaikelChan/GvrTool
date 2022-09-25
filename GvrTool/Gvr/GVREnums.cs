@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GvrTool
+namespace GvrTool.Gvr
 {
     // https://github.com/nickworonekin/puyotools
 

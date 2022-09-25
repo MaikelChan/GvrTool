@@ -1,4 +1,7 @@
-﻿using System;
+﻿using GvrTool.Gvr;
+using GvrTool.Pvr;
+using System;
+using System.IO;
 using System.Reflection;
 
 namespace GvrTool
@@ -19,38 +22,74 @@ namespace GvrTool
             try
             {
 #endif
-                switch (args[0])
+            switch (args[0])
+            {
+                case "-d":
+                case "--decode":
                 {
-                    case "-d":
-                    case "--decode":
+                    string extension = Path.GetExtension(args[1]);
+
+                    if (extension.Equals(".gvr", StringComparison.OrdinalIgnoreCase))
                     {
                         GVR gvr = new GVR();
                         gvr.LoadFromGvrFile(args[1]);
                         gvr.SaveToTgaFile(args[2]);
-
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"\"{args[1]}\" has been decoded successfully!");
+                    }
+                    else if (extension.Equals(".pvr", StringComparison.OrdinalIgnoreCase))
+                    {
+                        PVR pvr = new PVR();
+                        pvr.LoadFromPvrFile(args[1]);
+                        pvr.SaveToTgaFile(args[2]);
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"\"{args[1]}\" doesn't have the right extension. It must be either .gvr or .pvr.");
 
                         break;
                     }
-                    case "-e":
-                    case "--encode":
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"\"{args[1]}\" has been decoded successfully!");
+
+                    break;
+                }
+                case "-e":
+                case "--encode":
+                {
+                    string extension = Path.GetExtension(args[2]);
+
+                    if (extension.Equals(".gvr", StringComparison.OrdinalIgnoreCase))
                     {
                         GVR gvr = new GVR();
                         gvr.LoadFromTgaFile(args[1]);
                         gvr.SaveToGvrFile(args[2]);
-
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"\"{args[1]}\" has been encoded successfully!");
+                    }
+                    else if (extension.Equals(".pvr", StringComparison.OrdinalIgnoreCase))
+                    {
+                        PVR pvr = new PVR();
+                        pvr.LoadFromTgaFile(args[1]);
+                        pvr.SaveToPvrFile(args[2]);
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"\"{args[2]}\" doesn't have the right extension. It must be either .gvr or .pvr.");
 
                         break;
                     }
-                    default:
-                    {
-                        ShowUsage();
-                        return;
-                    }
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"\"{args[1]}\" has been encoded successfully!");
+
+                    break;
                 }
+                default:
+                {
+                    ShowUsage();
+                    return;
+                }
+            }
 #if !DEBUG
             }
             catch (Exception ex)
