@@ -14,7 +14,9 @@ namespace GvrTool.Tests
         const double THRESHOLD = 2d;
 
         [DataTestMethod]
-        [DataRow("0000.pvr")] // ImageData: I4, PaletteData: RGB5A3   - Resident Evil: Code Veronica (Dreamcast)
+        [DataRow("0000.pvr")] // ImageData: I8, PaletteData: ARGB8888   - Resident Evil: Code Veronica (Dreamcast)
+        [DataRow("0001.pvr")] // ImageData: I8, PaletteData: ARGB4444   - Resident Evil: Code Veronica (Dreamcast)
+
         public void RegenerateAndCheckIfEqual(string testFileName)
         {
             using (MD5 md5 = MD5.Create())

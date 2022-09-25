@@ -19,8 +19,6 @@ namespace GvrTool.Gvr.PaletteDataFormats
             byte[] output = new byte[DecodedDataLength];
             int offset = 0;
 
-            //if (DecodeSIMD(input, output)) return output;
-
             for (int p = 0; p < output.Length; p += 4)
             {
                 ushort entry = (ushort)((input[offset] << 8) | input[offset + 1]);
