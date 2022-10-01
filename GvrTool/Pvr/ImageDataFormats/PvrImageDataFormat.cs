@@ -13,6 +13,8 @@ namespace GvrTool.Pvr.ImageDataFormats
         {
             switch (dataFormat)
             {
+                case PvrDataFormat.Index4:
+                    return new I4_PvrImageDataFormat(width, height);
                 case PvrDataFormat.Index8:
                     return new I8_PvrImageDataFormat(width, height);
                 case PvrDataFormat.SquareTwiddled:
