@@ -95,7 +95,7 @@ namespace GvrTool.Pvr
                 fs.Position = 0x18;
                 PixelFormat = (PvrPixelFormat)br.ReadByte();
                 DataFormat = (PvrDataFormat)br.ReadByte();
-                ushort unknown = Width = br.ReadUInt16Endian(BIG_ENDIAN);
+                ushort unknown = br.ReadUInt16Endian(BIG_ENDIAN);
                 Width = br.ReadUInt16Endian(BIG_ENDIAN);
                 Height = br.ReadUInt16Endian(BIG_ENDIAN);
 
