@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31727.386
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GvrTool", "GvrTool\GvrTool.csproj", "{A8E8B550-307B-4ED4-BDB6-8AD4E5853C2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GvrTool.Tests", "GvrTool.Tests\GvrTool.Tests.csproj", "{289BD51C-88FA-47AE-A62F-7C4862500C87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GvrTool.Tests", "GvrTool.Tests\GvrTool.Tests.csproj", "{289BD51C-88FA-47AE-A62F-7C4862500C87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
