@@ -4,6 +4,8 @@ namespace GvrTool.Gvr.ImageDataFormats
 {
     class RGB5A3_GvrImageDataFormat : GvrImageDataFormat
     {
+        public override uint BitsPerPixel => 16;
+
         public override uint DecodedDataLength => (uint)((Width * Height) << 2);
         public override uint EncodedDataLength => (uint)((Width * Height) << 1);
 

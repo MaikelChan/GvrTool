@@ -5,6 +5,8 @@ namespace GvrTool.Gvr.ImageDataFormats
 {
     class Dxt1_GvrImageDataFormat : GvrImageDataFormat
     {
+        public override uint BitsPerPixel => 4;
+
         public override uint DecodedDataLength => (uint)(Width * Height * 4);
         public override uint EncodedDataLength => (uint)(Width * Height / 2);
 

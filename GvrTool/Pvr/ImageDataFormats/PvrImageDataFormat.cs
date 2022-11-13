@@ -14,10 +14,13 @@ namespace GvrTool.Pvr.ImageDataFormats
             switch (dataFormat)
             {
                 case PvrDataFormat.Index4:
+                case PvrDataFormat.Index4Mipmaps:
                     return new I4_PvrImageDataFormat(width, height);
                 case PvrDataFormat.Index8:
+                case PvrDataFormat.Index8Mipmaps:
                     return new I8_PvrImageDataFormat(width, height);
                 case PvrDataFormat.SquareTwiddled:
+                case PvrDataFormat.SquareTwiddledMipmaps:
                     return new SquareTwiddled_PvrImageDataFormat(width, height, pixelFormat);
                 default:
                     throw new NotImplementedException($"Unsupported PVR image data format: {dataFormat}.");

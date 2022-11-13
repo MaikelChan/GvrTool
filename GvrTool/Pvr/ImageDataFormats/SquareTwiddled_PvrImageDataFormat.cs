@@ -5,6 +5,8 @@ namespace GvrTool.Pvr.ImageDataFormats
 {
     class SquareTwiddled_PvrImageDataFormat : PvrImageDataFormat
     {
+        public override uint BitsPerPixel => bytesPerPixel * 8;
+
         public override uint DecodedDataLength => (uint)(Width * Height * 4);
         public override uint EncodedDataLength => (uint)(Width * Height * bytesPerPixel);
 
@@ -13,7 +15,7 @@ namespace GvrTool.Pvr.ImageDataFormats
         public override byte TgaAlphaChannelBits => 8;
 
         readonly PvrPixelFormat pixelFormat;
-        readonly int bytesPerPixel;
+        readonly uint bytesPerPixel;
 
         public SquareTwiddled_PvrImageDataFormat(ushort width, ushort height, PvrPixelFormat pixelFormat) : base(width, height)
         {
@@ -42,7 +44,7 @@ namespace GvrTool.Pvr.ImageDataFormats
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    sourceIndex = ((twiddleMap[x] << 1) | twiddleMap[y]) * bytesPerPixel;
+                    sourceIndex = ((twiddleMap[x] << 1) | twiddleMap[y]) * (int)bytesPerPixel;
 
                     switch (pixelFormat)
                     {
@@ -79,7 +81,7 @@ namespace GvrTool.Pvr.ImageDataFormats
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    destinationIndex = ((twiddleMap[x] << 1) | twiddleMap[y]) * bytesPerPixel;
+                    destinationIndex = ((twiddleMap[x] << 1) | twiddleMap[y]) * (int)bytesPerPixel;
 
                     switch (pixelFormat)
                     {

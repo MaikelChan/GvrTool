@@ -5,6 +5,8 @@ namespace GvrTool.Gvr.ImageDataFormats
 {
     class I8_GvrImageDataFormat : GvrImageDataFormat
     {
+        public override uint BitsPerPixel => 8;
+
         public override uint DecodedDataLength => (uint)(Width * Height);
         public override uint EncodedDataLength => (uint)(Width * Height);
 

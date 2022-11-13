@@ -23,6 +23,8 @@ namespace GvrTool.Pvr
         public ushort ExternalPaletteUnknown1 { get; private set; }
         public ushort ExternalPaletteUnknown2 { get; private set; }
 
+        public uint MainTextureOffset { get; private set; }
+
         public byte[] Pixels { get; private set; }
         public byte[] Palette { get; private set; }
 
@@ -99,12 +101,10 @@ namespace GvrTool.Pvr
                 Width = br.ReadUInt16Endian(BIG_ENDIAN);
                 Height = br.ReadUInt16Endian(BIG_ENDIAN);
 
-                if (HasMipmaps)
-                {
-                    throw new NotImplementedException($"Textures with mip maps are not supported.");
-                }
-
                 PvrImageDataFormat format = PvrImageDataFormat.Get(Width, Height, DataFormat, PixelFormat);
+
+                MainTextureOffset = CalculateMainTextureOffset(format);
+                fs.Position += MainTextureOffset;
                 Pixels = format.Decode(fs);
             }
 
@@ -167,6 +167,7 @@ namespace GvrTool.Pvr
             PaletteEntryCount = metadata.PaletteEntryCount;
             ExternalPaletteUnknown1 = metadata.ExternalPaletteUnknown1;
             ExternalPaletteUnknown2 = metadata.ExternalPaletteUnknown2;
+            MainTextureOffset = metadata.MainTextureOffset;
 
             TGA tga = new TGA(tgaFilePath);
 
@@ -253,7 +254,8 @@ namespace GvrTool.Pvr
                 PalettePixelFormat = PalettePixelFormat,
                 PaletteEntryCount = PaletteEntryCount,
                 ExternalPaletteUnknown1 = ExternalPaletteUnknown1,
-                ExternalPaletteUnknown2 = ExternalPaletteUnknown2
+                ExternalPaletteUnknown2 = ExternalPaletteUnknown2,
+                MainTextureOffset = MainTextureOffset
             };
 
             PVRMetadata.SaveMetadataToJson(metadata, Path.ChangeExtension(tgaFilePath, ".json"));
@@ -272,8 +274,9 @@ namespace GvrTool.Pvr
             }
 
             PvrImageDataFormat format = PvrImageDataFormat.Get(Width, Height, DataFormat, PixelFormat);
+            uint mainTextureOffset = CalculateMainTextureOffset(format);
 
-            using (FileStream fs = File.OpenWrite(pvrFilePath))
+            using (FileStream fs = File.Create(pvrFilePath))
             using (BinaryWriter bw = new BinaryWriter(fs))
             {
                 bw.Write(GBIX_MAGIC);
@@ -282,13 +285,14 @@ namespace GvrTool.Pvr
                 bw.WriteEndian(Padding1, BIG_ENDIAN);
 
                 bw.Write(PVRT_MAGIC);
-                bw.Write(format.EncodedDataLength + 8);
+                bw.Write(mainTextureOffset + format.EncodedDataLength + 8);
                 bw.Write((byte)PixelFormat);
                 bw.Write((byte)DataFormat);
                 bw.WriteEndian((ushort)0x0, BIG_ENDIAN); //TODO: ???
                 bw.WriteEndian(Width, BIG_ENDIAN);
                 bw.WriteEndian(Height, BIG_ENDIAN);
 
+                fs.Position += mainTextureOffset;
                 byte[] pvrtPixels = format.Encode(Pixels);
                 fs.Write(pvrtPixels, 0, pvrtPixels.Length);
             }
@@ -299,7 +303,7 @@ namespace GvrTool.Pvr
 
                 PvrPaletteDataFormat paletteFormat = PvrPaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
 
-                using (FileStream fs = File.OpenWrite(pvpFilePath))
+                using (FileStream fs = File.Create(pvpFilePath))
                 using (BinaryWriter bw = new BinaryWriter(fs))
                 {
                     bw.Write(PVPL_MAGIC);
@@ -313,6 +317,47 @@ namespace GvrTool.Pvr
                     fs.Write(palette, 0, palette.Length);
                 }
             }
+        }
+
+        uint CalculateMainTextureOffset(PvrImageDataFormat format)
+        {
+            if (!HasMipmaps)
+            {
+                return 0;
+            }
+
+            uint offset = 0;
+
+            int mipmapCount = (int)Math.Log(Width, 2);
+
+            // Calculate the initial padding for the 1x1 mipmap.
+            // Due to PVR twiddling works, the actual pixel will be in the last bytes of its mipmap.
+            switch (DataFormat)
+            {
+                // A 1x1 mipmap takes up as much space as a 2x1 mipmap.
+                case PvrDataFormat.SquareTwiddledMipmaps:
+                    offset += format.BitsPerPixel / 8;
+                    break;
+
+                // A 1x1 mipmap takes up as much space as a 2x2 mipmap.
+                // The pixel is stored in the upper 4 bits of the final byte.
+                case PvrDataFormat.Index4Mipmaps:
+                    offset += 2 * format.BitsPerPixel / 8;
+                    break;
+
+                // A 1x1 mipmap takes up as much space as a 2x2 mipmap.
+                case PvrDataFormat.Index8Mipmaps:
+                case PvrDataFormat.SquareTwiddledMipmapsAlt:
+                    offset += 3 * format.BitsPerPixel / 8;
+                    break;
+            }
+
+            for (int i = mipmapCount - 1, size = 1; i >= 0; i--, size <<= 1)
+            {
+                offset += (uint)Math.Max(size * size * format.BitsPerPixel / 8, 1);
+            }
+
+            return offset;
         }
     }
 }

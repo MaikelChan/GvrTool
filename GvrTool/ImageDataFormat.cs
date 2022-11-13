@@ -8,6 +8,8 @@ namespace GvrTool
         public ushort Width { get; set; }
         public ushort Height { get; set; }
 
+        public abstract uint BitsPerPixel { get; }
+
         public abstract uint DecodedDataLength { get; }
         public abstract uint EncodedDataLength { get; }
 

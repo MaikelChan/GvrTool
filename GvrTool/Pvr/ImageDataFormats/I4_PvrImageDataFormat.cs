@@ -5,6 +5,8 @@ namespace GvrTool.Pvr.ImageDataFormats
 {
     class I4_PvrImageDataFormat : PvrImageDataFormat
     {
+        public override uint BitsPerPixel => 4;
+
         public override uint DecodedDataLength => (uint)(Width * Height);
         public override uint EncodedDataLength => (uint)((Width * Height) >> 1);
 

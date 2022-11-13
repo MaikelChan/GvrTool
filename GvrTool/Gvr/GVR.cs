@@ -267,7 +267,7 @@ namespace GvrTool.Gvr
 
             GvrImageDataFormat format = GvrImageDataFormat.Get(Width, Height, DataFormat);
 
-            using (FileStream fs = File.OpenWrite(gvrFilePath))
+            using (FileStream fs = File.Create(gvrFilePath))
             using (BinaryWriter bw = new BinaryWriter(fs))
             {
                 bw.Write(GCIX_MAGIC);
@@ -293,7 +293,7 @@ namespace GvrTool.Gvr
 
                 GvrPaletteDataFormat paletteFormat = GvrPaletteDataFormat.Get(PaletteEntryCount, PalettePixelFormat);
 
-                using (FileStream fs = File.OpenWrite(gvpFilePath))
+                using (FileStream fs = File.Create(gvpFilePath))
                 using (BinaryWriter bw = new BinaryWriter(fs))
                 {
                     bw.Write(GVPL_MAGIC);

@@ -19,7 +19,9 @@ namespace GvrTool.Pvr
         public ushort ExternalPaletteUnknown1 { get; set; }
         public ushort ExternalPaletteUnknown2 { get; set; }
 
-        const uint METADATA_VERSION = 1;
+        public uint MainTextureOffset { get; set; }
+
+        const uint METADATA_VERSION = 2;
 
         public static void SaveMetadataToJson(PVRMetadata metadata, string jsonFilePath)
         {
