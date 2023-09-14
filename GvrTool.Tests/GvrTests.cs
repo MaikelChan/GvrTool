@@ -86,6 +86,7 @@ namespace GvrTool.Tests
 
         [DataTestMethod]
         [DataRow("0003.gvr")] // ImageData: Dxt1                      - Resident Evil: Code Veronica (GameCube)
+        [DataRow("0006.gvr")] // ImageData: Dxt1                      - Resident Evil: Code Veronica (GameCube)
         public void RegenerateAndCheckIfSimilar(string testFileName)
         {
             using (MD5 md5 = MD5.Create())
